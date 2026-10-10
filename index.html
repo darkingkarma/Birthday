@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Birthday Surprise for Pat</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #fff0f2;
+      color: #742337;
+      font-family: Georgia, serif;
+      overflow-x: hidden;
+    }
+
+    .screen {
+      min-height: 100vh;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 25px 18px;
+      animation: fadeIn 0.8s ease;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* BIRTHDAY TITLE */
+
+    .birthday-title {
+      font-size: clamp(2rem, 7vw, 3.2rem);
+      color: #b51f3b;
+      margin-bottom: 12px;
+    }
+
+    .birthday-subtitle {
+      font-family: Arial, sans-serif;
+      color: #9a6571;
+      font-size: 0.95rem;
+      margin-bottom: 35px;
+    }
+
+    /* ROSE-RED CAKE */
+
+    .cake-area {
+      position: relative;
+      width: 280px;
+      height: 230px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      margin-bottom: 25px;
+    }
+
+    .cake {
+      position: relative;
+      width: 210px;
+      height: 105px;
+      background: #c62845;
+      border-radius: 8px 8px 12px 12px;
+      box-shadow:
+        inset 0 -9px #941a34,
+        0 9px 15px #8b26331c;
+    }
+
+    .cake-top {
+      position: absolute;
+      top: -15px;
+      left: 0;
+      width: 100%;
+      height: 30px;
+      border-radius: 50%;
+      background: #e34b65;
+      border: 3px solid #f5b5bf;
+    }
+
+    .icing {
+      position: absolute;
+      top: 1px;
+      left: 12px;
+      width: 186px;
+      height: 24px;
+      border-radius: 50%;
+      background: #ffdce2;
+      z-index: 1;
+    }
+
+    .drip {
+      position: absolute;
+      top: 12px;
+      left: 30px;
+      width: 15px;
+      height: 22px;
+      border-radius: 0 0 10px 10px;
+      background: #ffdce2;
+      z-index: 2;
+    }
+
+    .drip.two {
+      left: 96px;
+      height: 30px;
+    }
+
+    .drip.three {
+      left: 164px;
+      height: 19px;
+    }
+
+    /* CLICKABLE CANDLES */
+
+    .candle {
+      position: absolute;
+      bottom: 110px;
+      width: 30px;
+      height: 65px;
+      border: none;
+      padding: 0;
+      background: transparent;
+      z-index: 5;
+      cursor: pointer;
+    }
+
+    .candle.one {
+      left: 45px;
+    }
+
+    .candle.two {
+      left: 90px;
+    }
+
+    .candle.three {
+      left: 135px;
+    }
+
+    .candle-stick {
+      position: absolute;
+      bottom: 0;
+      left: 8px;
+      width: 14px;
+      height: 43px;
+      background: repeating-linear-gradient(
+        45deg,
+        #fff0f2 0 6px,
+        #c62845 6px 12px
+      );
+      border-radius: 3px 3px 0 0;
+      box-shadow: 0 0 0 1px #b51f3b20;
+    }
+
+    .wick {
+      position: absolute;
+      bottom: 43px;
+      left: 14px;
+      width: 3px;
+      height: 7px;
+      background: #542a2e;
+      border-radius: 2px;
+    }
+
+    /* FLAMES START HIDDEN */
+
+    .flame {
+      position: absolute;
+      width: 17px;
+      height: 24px;
+      left: 6.5px;
+      bottom: 49px;
+      background: #ffad28;
+      border-radius: 50% 50% 45% 45%;
+      box-shadow: 0 0 16px #ff9d3580;
+      opacity: 0;
+      transform: scale(0);
+      transform-origin: bottom center;
+      pointer-events: none;
+    }
+
+    .flame::after {
+      content: "";
+      position: absolute;
+      width: 7px;
+      height: 12px;
+      background: #fff7bf;
+      border-radius: 50%;
+      left: 5px;
+      top: 7px;
+    }
+
+    .candle.lit .flame {
+      opacity: 1;
+      transform: scale(1);
+      animation: flicker 0.7s infinite alternate;
+    }
+
+    .candle.lit .wick {
+      background: #ffad28;
+    }
+
+    @keyframes flicker {
+      from {
+        transform: scale(1) rotate(-5deg);
+      }
+      to {
+        transform: scale(1.1) rotate(5deg);
+      }
+    }
+
+    .instruction {
+      font-family: Arial, sans-serif;
+      color: #9a6571;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin: 0 0 10px;
+    }
+
+    .progress {
+      font-family: Arial, sans-serif;
+      color: #b51f3b;
+      font-size: 0.8rem;
+      margin-top: 8px;
+    }
+
+    /* ENVELOPE SCREEN */
+
+    .envelope-button {
+      border: none;
+      background: transparent;
+      padding: 20px;
+      perspective: 1000px;
+    }
+
+    .envelope {
+      position: relative;
+      width: 260px;
+      height: 175px;
+      background: #c62845;
+      border-radius: 5px;
+      box-shadow: 0 15px 35px #97163438;
+      transition: transform 0.4s ease;
+      transform-style: preserve-3d;
+      isolation: isolate;
+    }
+
+    .envelope-button:hover .envelope {
+      transform: translateY(-6px);
+    }
+
+    .envelope-back {
+      position: absolute;
+      inset: 0;
+      background: #e8a0aa;
+      border-radius: 5px;
+      z-index: 0;
+    }
+
+    /* LETTER INSIDE ENVELOPE */
+
+    .letter-preview {
+      position: absolute;
+      left: 15px;
+      bottom: 8px;
+      width: 230px;
+      height: 145px;
+      background: #fffaf0;
+      border: 1px solid #e8d4c7;
+      border-radius: 3px;
+      z-index: 1;
+      transform: translateY(0);
+      transition: transform 0.9s ease 0.35s;
+    }
+
+    .letter-preview::before {
+      content: "";
+      position: absolute;
+      top: 28px;
+      left: 25px;
+      width: 65%;
+      height: 1px;
+      background: #e8c9c9;
+      box-shadow:
+        0 13px #e8c9c9,
+        0 26px #e8c9c9,
+        0 39px #e8c9c9;
+      opacity: 0.7;
+    }
+
+    .envelope-front {
+      position: absolute;
+      inset: 0;
+      background: #c62845;
+      clip-path: polygon(
+        0 0,
+        50% 58%,
+        100% 0,
+        100% 100%,
+        0 100%
+      );
+      border-radius: 5px;
+      z-index: 3;
+    }
+
+    .envelope-flap {
+      position: absolute;
+      inset: 0;
+      background: #b51f3b;
+      clip-path: polygon(0 0, 100% 0, 50% 58%);
+      transform-origin: top center;
+      transform: rotateX(0deg);
+      transition:
+        transform 0.75s ease,
+        z-index 0s 0.75s;
+      backface-visibility: visible;
+      z-index: 5;
+    }
+
+    .seal {
+      position: absolute;
+      width: 43px;
+      height: 43px;
+      left: 50%;
+      top: 53%;
+      transform: translate(-50%, -50%);
+      border: 2px solid #f5b5bf;
+      border-radius: 50%;
+      background: #8f1732;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 23px;
+      box-shadow: 0 3px 8px #74132935;
+      z-index: 6;
+      transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
+    }
+
+    /* OPEN ENVELOPE */
+
+    .envelope-button.opening {
+      pointer-events: none;
+      animation: envelopeFade 0.65s ease 1.25s forwards;
+    }
+
+    .envelope-button.opening .envelope {
+      transform: translateY(-4px);
+    }
+
+    .envelope-button.opening .envelope-flap {
+      transform: rotateX(180deg);
+      z-index: 1;
+      transition:
+        transform 0.75s ease,
+        z-index 0s;
+    }
+
+    .envelope-button.opening .letter-preview {
+      transform: translateY(-100px);
+    }
+
+    .envelope-button.opening .seal {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.5);
+    }
+
+    @keyframes envelopeFade {
+      to {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.94);
+      }
+    }
+
+    /* BIRTHDAY LETTER */
+
+    .letter {
+      max-width: 520px;
+      width: 100%;
+      padding: 35px 28px;
+      background: #fffaf6;
+      border: 1px solid #f0ccd1;
+      border-radius: 8px;
+      box-shadow: 0 15px 40px #8f17321a;
+      text-align: left;
+      line-height: 1.9;
+    }
+
+    .letter-decoration {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+    }
+
+    .letter h2 {
+      color: #b51f3b;
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 22px;
+      font-weight: normal;
+    }
+
+    .letter p {
+      margin-bottom: 16px;
+      color: #744b51;
+      font-size: 1rem;
+    }
+
+    .signoff {
+      margin-top: 24px;
+      text-align: right;
+      color: #b51f3b;
+    }
+
+    .signature {
+      font-size: 1.1rem;
+      font-style: italic;
+    }
+
+    .small-note {
+      font-family: Arial, sans-serif;
+      font-size: 0.8rem;
+      color: #a87982;
+      margin-top: 18px;
+    }
+
+    /* MOBILE RESPONSIVENESS */
+
+    @media (max-width: 400px) {
+      .envelope {
+        width: 230px;
+        height: 155px;
+      }
+
+      .letter-preview {
+        width: 200px;
+        height: 130px;
+      }
+
+      .letter {
+        padding: 28px 21px;
+      }
+
+      .letter p {
+        font-size: 0.95rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SCREEN 1: BIRTHDAY CAKE -->
+
+  <section id="screen1" class="screen active">
+
+    <h1 class="birthday-title">Happy Birthday, Pat!</h1>
+
+    <p class="birthday-subtitle">
+      A little birthday wish, made just for you.
+    </p>
+
+    <div class="cake-area">
+      <div class="cake">
+        <div class="cake-top"></div>
+        <div class="icing"></div>
+
+        <div class="drip"></div>
+        <div class="drip two"></div>
+        <div class="drip three"></div>
+
+        <button
+          class="candle one"
+          onclick="lightCandle(this)"
+          aria-label="Light the first candle"
+        >
+          <span class="flame"></span>
+          <span class="wick"></span>
+          <span class="candle-stick"></span>
+        </button>
+
+        <button
+          class="candle two"
+          onclick="lightCandle(this)"
+          aria-label="Light the second candle"
+        >
+          <span class="flame"></span>
+          <span class="wick"></span>
+          <span class="candle-stick"></span>
+        </button>
+
+        <button
+          class="candle three"
+          onclick="lightCandle(this)"
+          aria-label="Light the third candle"
+        >
+          <span class="flame"></span>
+          <span class="wick"></span>
+          <span class="candle-stick"></span>
+        </button>
+      </div>
+    </div>
+
+    <p class="instruction" id="candleInstruction">
+      Make a birthday wish and light each candle. ✨
+    </p>
+
+    <p class="progress" id="candleProgress">
+      0 of 3 candles lit
+    </p>
+
+  </section>
+
+  <!-- SCREEN 2: ROSE ENVELOPE -->
+
+  <section id="screen2" class="screen">
+
+    <button
+      class="envelope-button"
+      id="envelopeButton"
+      onclick="openEnvelope()"
+      aria-label="Open envelope"
+    >
+      <div class="envelope">
+        <div class="envelope-back"></div>
+        <div class="letter-preview"></div>
+        <div class="envelope-front"></div>
+        <div class="envelope-flap"></div>
+        <div class="seal">🌹</div>
+      </div>
+    </button>
+
+  </section>
+
+  <!-- SCREEN 3: BIRTHDAY LETTER -->
+
+  <section id="screen3" class="screen">
+
+
+    <article class="letter">
+
+        <div class="letter-decoration">🌹 ♡ 🌹</div>
+
+        <h2>For Pat</h2>
+
+        <p>Hi, Dude!</p>
+
+        <p>
+            Happy birthday, dude! I hope you're happy today and that
+            you enjoy your special day. My wish for you, dude, is that
+            you get more happiness, good health, and more blessings
+            to come into your life.
+        </p>
+
+        <p>
+            I hope, dude, that you achieve your goals and dreams.
+            And I know nga daghan kaayog plano si God para sa imoha,
+            and dili ka Niya biyaan.
+        </p>
+
+        <p>
+            Basta, always remember, dude, to take care of yourself, ha?
+            Pahulay kung gikapoy, and ayaw pud kalimot nga daghan ka
+            important people sa imong life nga willing to listen to you.
+            And also, always give yourself time to enjoy pud.
+        </p>
+
+        <p>
+            Enjoy your birthday, dude, and welcome sa bag-ong kabanata
+            sa imong life. Amping ka permi!
+        </p>
+
+        <p>
+            Happy birthday again, dude! 🤍
+        </p>
+
+        <div class="signoff">
+            <p>Warm birthday wishes,</p>
+            <p class="signature">From someone wishing you well ♡</p>
+        </div>
+
+    </article>
+
+
+    <p class="small-note">Made with warm birthday wishes.</p>
+
+  </section>
+
+  <script>
+    let litCandles = 0;
+    let letterTimer = null;
+    let envelopeOpened = false;
+
+    /* CHANGE SCREENS */
+
+    function showScreen(screenId) {
+      document.querySelectorAll(".screen").forEach(function(screen) {
+        screen.classList.remove("active");
+      });
+
+      document.getElementById(screenId).classList.add("active");
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    }
+
+    /* LIGHT THE CANDLES */
+
+    function lightCandle(candle) {
+      // Do not count a candle more than once.
+      if (candle.classList.contains("lit")) {
+        return;
+      }
+
+      candle.classList.add("lit");
+      candle.disabled = true;
+      litCandles++;
+
+      document.getElementById("candleProgress").textContent =
+        litCandles + " of 3 candles lit";
+
+      if (litCandles < 3) {
+        document.getElementById("candleInstruction").textContent =
+          "Lovely! Light the remaining candles. 🌹";
+      } else {
+        document.getElementById("candleInstruction").textContent =
+          "All your candles are glowing, Pat! ♡";
+
+        // Show the envelope after all three candles are lit.
+        letterTimer = setTimeout(function() {
+          showScreen("screen2");
+        }, 1800);
+      }
+    }
+
+    /* OPEN THE ENVELOPE */
+
+    function openEnvelope() {
+      if (envelopeOpened) {
+        return;
+      }
+
+      envelopeOpened = true;
+
+      const envelopeButton =
+        document.getElementById("envelopeButton");
+
+      envelopeButton.classList.add("opening");
+
+      // Allow the flap and letter animation to finish.
+      setTimeout(function() {
+        showScreen("screen3");
+      }, 1950);
+    }
+  </script>
+
+</body>
+</html>
+```
